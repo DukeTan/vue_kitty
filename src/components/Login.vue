@@ -59,8 +59,9 @@ export default {
     login(){
       this.$refs.loginFormRef.validate(async (valid) =>{
         if (!valid) return;
-        const result = await this.$http.post("login", this.loginForm);
-        console.log(result);
+        const {data : res} = await this.$http.post("login", this.loginForm);
+        if(res.meta.status !== 200) return console.log("Login failed")
+        console.log("Login completed")
       });
     }
   } 
