@@ -39,8 +39,8 @@ export default {
     return {
       //Login Form data bind object
       loginForm: {
-        username:'',
-        password:''
+        username:'admin',
+        password:'123456'
       },
       //info validation
       loginFormRules: {
@@ -57,11 +57,17 @@ export default {
       this.$refs.loginFormRef.resetFields();
     },
     login(){
+      //Login client validation
       this.$refs.loginFormRef.validate(async (valid) =>{
         if (!valid) return;
+        //data -> res (data came from axios object contain token)
         const {data : res} = await this.$http.post("login", this.loginForm);
-        if(res.meta.status !== 200) return console.log("Login failed")
-        console.log("Login completed")
+        if(res.meta.status !== 200) return this.$message.error('Login failed');
+        this.$message.success('Login success');
+        //save token to sessionStorage (Window object)
+        window.sessionStorage.setItem('token', res.data.token);
+        //switch to Home page
+        this.$router.push('/home')
       });
     }
   } 
