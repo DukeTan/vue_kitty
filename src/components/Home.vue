@@ -1,7 +1,12 @@
 <template>
     <el-container class="home-container">
         <!--Header-->
-        <el-header>Header<el-button type="info" @click="logout">Exit</el-button>
+        <el-header>
+            <div>
+                <img src="" alt="">
+                <span>Kitty E-commerce Management System</span>
+            </div>
+            <el-button type="info" @click="logout">Exit</el-button>
         </el-header>
         <!--main area-->
         <el-container>
@@ -30,6 +35,7 @@ export default {
 }
 .el-header{
     background-color: #373D41;
+    display: flex;
 }
 .el-aside{
     background-color: #333744;
