@@ -1,5 +1,5 @@
 <template>
-    <el-container>
+    <el-container class="home-container">
         <!--Header-->
         <el-header>Header<el-button type="info" @click="logout">Exit</el-button>
         </el-header>
@@ -25,5 +25,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
+.home-container{
+    height: 100%;
+}
+.el-header{
+    background-color: #373D41;
+}
+.el-aside{
+    background-color: #333744;
+}
+.el-main{
+    background-color: #EAEDF1;
+}
 </style>

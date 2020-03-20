@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import { Button, FormItem, Input, Message } from 'element-ui'
+import { Button, FormItem, Input, Message, Container, Aside, Header, Main } from 'element-ui'
 
 import './assets/css/global.css'
 
@@ -18,7 +18,11 @@ Vue.prototype.$message = Message
 Vue.use(Button)
 Vue.use(FormItem)
 Vue.use(Form)
-vue.use(Input)
+Vue.use(Input)
+Vue.use(Container)
+Vue.use(Header)
+Vue.use(Main)
+Vue.use(Aside)
 
 Vue.config.productionTip = false
 
