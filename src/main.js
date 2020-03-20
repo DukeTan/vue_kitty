@@ -3,8 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import ElementUI, { Message } from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
+import { Button, FormItem, Input, Message } from 'element-ui'
 
 import './assets/css/global.css'
 
@@ -16,9 +15,10 @@ axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
 Vue.prototype.$http = axios
 Vue.prototype.$message = Message
 
-
-Vue.use(ElementUI)
-Vue.use(Message)
+Vue.use(Button)
+Vue.use(FormItem)
+Vue.use(Form)
+vue.use(Input)
 
 Vue.config.productionTip = false
 
