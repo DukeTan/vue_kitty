@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import { Button, FormItem, Input, Message, Container, Aside, Header, Main } from 'element-ui'
+import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main } from 'element-ui'
 
 import './assets/css/global.css'
 
