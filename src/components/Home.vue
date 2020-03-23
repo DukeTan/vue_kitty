@@ -11,9 +11,10 @@
     <!--main area-->
     <el-container>
       <!--aside-->
-      <el-aside width="200px">
+      <el-aside :width="isCollapse ? '64px' : '200px'">
+        <div class="toggle-button" @click="toggleCollapse">丨丨丨</div>
         <!--menu area-->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF">
+        <el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF" :unique-opened="true" :collapse="isCollapse" :collapse-transition="false">
           <!--1st class menu-->
           <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <!--1st class menu template-->
@@ -37,7 +38,10 @@
         </el-menu>
       </el-aside>
       <!--right content-->
-      <el-main>Main</el-main>
+      <el-main>
+        <!--route placeholder-->
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -53,7 +57,9 @@ export default {
         '101': 'el-icon-s-goods',
         '102': 'el-icon-s-order',
         '145': 'el-icon-s-marketing'
-      }
+      },
+      //defaule menu not collapse
+      isCollapse: false
     }
   },
   created(){
@@ -70,6 +76,10 @@ export default {
     if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
     this.menulist = res.data
     console.log(res)
+    },
+    //Click button to collapse menu
+    toggleCollapse(){
+      this.isCollapse = ! this.isCollapse
     }
   }
 };
@@ -97,6 +107,9 @@ export default {
 }
 .el-aside {
   background-color: #333744;
+  .el-menu {
+    border-right: none;
+  }
 }
 .el-main {
   background-color: #eaedf1;
@@ -104,4 +117,12 @@ export default {
 .el-icon {
   margin-right: 10px;
 }
+.toggle-button{
+   background-color: #4a5064;
+   font-size: 10px; 
+   line-height: 24px;
+   color: antiquewhite;
+   text-align: center;
+   cursor: pointer;
+  }
 </style>
