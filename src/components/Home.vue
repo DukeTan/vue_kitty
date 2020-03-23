@@ -13,24 +13,24 @@
       <!--aside-->
       <el-aside width="200px">
         <!--menu area-->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b">
+        <el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF">
           <!--1st class menu-->
-          <el-submenu index="1">
+          <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <!--1st class menu template-->
             <template slot="title">
               <!--icon-->
-              <i class="el-icon-location"></i>
+              <i :class="iconsObj[item.id]"></i>
               <!-- content -->
-              <span>Navigator1</span>
+              <span>{{item.authName}}</span>
             </template>
             <!--2nd class menu-->
-            <el-menu-item index="1-4-1">
+            <el-menu-item :index="subItem.id + ''" v-for="subItem in item.children" :key="subItem.id">
               <!--2nd class menu template-->
               <template slot="title">
                 <!--icon-->
-                <i class="el-icon-location"></i>
+                <i class="el-icon-menu"></i>
                 <!-- content -->
-                <span>content1</span>
+                <span>{{subItem.authName}}</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -44,10 +44,32 @@
 
 <script>
 export default {
+  data(){
+    return {
+      menulist: [],
+      iconsObj: {
+        '125': 'el-icon-user-solid',
+        '103': 'el-icon-s-management',
+        '101': 'el-icon-s-goods',
+        '102': 'el-icon-s-order',
+        '145': 'el-icon-s-marketing'
+      }
+    }
+  },
+  created(){
+    this.getMenuList()
+  },
   methods: {
     logout() {
       window.sessionStorage.clear();
       this.$router.push("/login");
+    },
+    //get all menu
+    async getMenuList(){
+    const {data: res} = await this.$http.get('menus')
+    if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+    this.menulist = res.data
+    console.log(res)
     }
   }
 };
@@ -78,5 +100,8 @@ export default {
 }
 .el-main {
   background-color: #eaedf1;
+}
+.el-icon {
+  margin-right: 10px;
 }
 </style>
