@@ -14,7 +14,16 @@
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="toggleCollapse">丨丨丨</div>
         <!--menu area-->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF" :unique-opened="true" :collapse="isCollapse" :collapse-transition="false">
+        <el-menu
+          background-color="#333744"
+          text-color="#fff"
+          active-text-color="#409EFF"
+          :unique-opened="true"
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          router
+          default-active="this.$router.history.current.path"
+        >
           <!--1st class menu-->
           <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <!--1st class menu template-->
@@ -25,7 +34,11 @@
               <span>{{item.authName}}</span>
             </template>
             <!--2nd class menu-->
-            <el-menu-item :index="subItem.id + ''" v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item
+              :index="'/' + subItem.path"
+              v-for="subItem in item.children"
+              :key="subItem.id"
+            >
               <!--2nd class menu template-->
               <template slot="title">
                 <!--icon-->
@@ -48,22 +61,22 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
       menulist: [],
       iconsObj: {
-        '125': 'el-icon-user-solid',
-        '103': 'el-icon-s-management',
-        '101': 'el-icon-s-goods',
-        '102': 'el-icon-s-order',
-        '145': 'el-icon-s-marketing'
+        "125": "el-icon-user-solid",
+        "103": "el-icon-s-management",
+        "101": "el-icon-s-goods",
+        "102": "el-icon-s-order",
+        "145": "el-icon-s-marketing"
       },
       //defaule menu not collapse
       isCollapse: false
-    }
+    };
   },
-  created(){
-    this.getMenuList()
+  created() {
+    this.getMenuList();
   },
   methods: {
     logout() {
@@ -71,15 +84,15 @@ export default {
       this.$router.push("/login");
     },
     //get all menu
-    async getMenuList(){
-    const {data: res} = await this.$http.get('menus')
-    if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
-    this.menulist = res.data
-    console.log(res)
+    async getMenuList() {
+      const { data: res } = await this.$http.get("menus");
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg);
+      this.menulist = res.data;
+      console.log(res);
     },
     //Click button to collapse menu
-    toggleCollapse(){
-      this.isCollapse = ! this.isCollapse
+    toggleCollapse() {
+      this.isCollapse = !this.isCollapse;
     }
   }
 };
@@ -117,12 +130,12 @@ export default {
 .el-icon {
   margin-right: 10px;
 }
-.toggle-button{
-   background-color: #4a5064;
-   font-size: 10px; 
-   line-height: 24px;
-   color: antiquewhite;
-   text-align: center;
-   cursor: pointer;
-  }
+.toggle-button {
+  background-color: #4a5064;
+  font-size: 10px;
+  line-height: 24px;
+  color: antiquewhite;
+  text-align: center;
+  cursor: pointer;
+}
 </style>
