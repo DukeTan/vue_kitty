@@ -12,15 +12,71 @@
       <!-- search & add area -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入内容">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input placeholder="请输入内容" v-model="queryInfo.query" clearable @clear="getUserList">
+            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">Add User</el-button>
+          <el-button type="primary" @click="addDialogVisible = true">Add User</el-button>
         </el-col>
       </el-row>
+      <!-- user list area -->
+      <el-table :data="userlist" border stripe>
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="name" prop="username"></el-table-column>
+        <el-table-column label="email" prop="email"></el-table-column>
+        <el-table-column label="mobile" prop="mobile"></el-table-column>
+        <el-table-column label="role" prop="role_name"></el-table-column>
+        <el-table-column label="status">
+          <template v-slot:default="scope">
+            <el-switch v-model="scope.row.mg_state" @change="userStateChanged(scope.row)"></el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="operation" width="180px">
+          <template v-slot:default="scope">
+            <el-button type="primary" icon="el-icon-edit" size="small"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="small"></el-button>
+            <el-tooltip effect="dark" content="Top Center 提示文字" placement="top" :enterable="false">
+              <el-button type="warning" icon="el-icon-setting" size="small"></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- pagination area -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum"
+        :page-sizes="[1, 2, 5, 10]"
+        :page-size="queryInfo.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="queryInfo.total"
+      ></el-pagination>
     </el-card>
+
+    <!-- add user dialog -->
+    <el-dialog title="Add User" :visible.sync="addDialogVisible" width="30%">
+      <!-- content -->
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+        <el-form-item label="USER NAME" prop="username">
+          <el-input v-model="addForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="PASS WORD" prop="password">
+          <el-input v-model="addForm.password"></el-input>
+        </el-form-item>
+        <el-form-item label="EMAIL" prop="email">
+          <el-input v-model="addForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="MOBILE" prop="mobile">
+          <el-input v-model="addForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <!-- foot button -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -31,11 +87,61 @@ export default {
       //get user list param obj
       queryInfo: {
         query: "",
+        //current page
         pagenum: 1,
-        pagesize: 2
+        //current page contain data
+        pagesize: 5
       },
-      userList: [],
+      userlist: [],
       total: 0,
+      //default hide dialog
+      addDialogVisible: false,
+      //add user form data
+      addForm: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: ''
+      },
+      //add user form rules
+      addFormRules: {},
+      //add user name validate rules
+      username: [
+        { required: true, message: "Please enter user name", trigger: "blur" },
+        {
+          min: 3,
+          max: 10,
+          message: "3-10 characters in length",
+          trigger: "blur"
+        }
+      ],
+      password: [
+        {
+          required: true,
+          message: "please enter your password",
+          trigger: "blur"
+        },
+        {
+          min: 6,
+          max: 15,
+          message: "6-15 characters in length",
+          trigger: "blur"
+        }
+      ],
+      email: [
+        {
+          required: true,
+          message: "please enter your email",
+          trigger: "blur"
+        }
+      ],
+      mobile: [
+        {
+          required: true,
+          message: "please enter your mobile No",
+          trigger: "blur"
+        }
+      ]
     };
   },
   created() {
@@ -47,11 +153,32 @@ export default {
         params: this.queryInfo
       });
       if (res.meta.status !== 200) {
-        return this.$message.error('failed to get user list');
+        return this.$message.error("failed to get user list");
       }
-      this.userList = res.data.user
-      this.total = res.data.total
+      this.userlist = res.data.users;
+      this.total = res.data.total;
       console.log(res);
+    },
+    //lisitner for page size change
+    handleSizeChange(newSize) {
+      this.queryInfo.pagesize = newSize;
+      this.getUserList();
+    },
+    //listener for page no change
+    handleCurrentChange(newPage) {
+      this.queryInfo.pagenum = newPage;
+      this.getUserList();
+    },
+    //listener for switch status change
+    async userStateChanged(userInfo) {
+      const { data: res } = await this.$http.put(
+        `/users/${userInfo.id}/state/${userInfo.mg_state}`
+      );
+      if (res.meta.status !== 200) {
+        userInfo.mg_state = !userInfo.mg_state;
+        return (this.$message.error = "update user state failed");
+      }
+      this.$message.success("update user state success");
     }
   }
 };
