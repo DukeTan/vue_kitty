@@ -33,10 +33,15 @@
           </template>
         </el-table-column>
         <el-table-column label="operation" width="180px">
-          <template v-slot:default="scope">
-            <el-button type="primary" icon="el-icon-edit" size="small"></el-button>
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="small"
+              @click="showEditDialog(scope.row.id)"
+            ></el-button>
             <el-button type="danger" icon="el-icon-delete" size="small"></el-button>
-            <el-tooltip effect="dark" content="Top Center 提示文字" placement="top" :enterable="false">
+            <el-tooltip effect="dark" content="Setting" placement="top" :enterable="false">
               <el-button type="warning" icon="el-icon-setting" size="small"></el-button>
             </el-tooltip>
           </template>
@@ -55,9 +60,14 @@
     </el-card>
 
     <!-- add user dialog -->
-    <el-dialog title="Add User" :visible.sync="addDialogVisible" width="30%">
+    <el-dialog
+      title="Add User"
+      :visible.sync="addDialogVisible"
+      width="30%"
+      @close="addDialogClosed"
+    >
       <!-- content -->
-      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="110px">
         <el-form-item label="USER NAME" prop="username">
           <el-input v-model="addForm.username"></el-input>
         </el-form-item>
@@ -74,7 +84,27 @@
       <!-- foot button -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- modify user dialog -->
+    <el-dialog title="Modify User" :visible.sync="modifyDialogVisible" width="50%">
+      <!-- modify content -->
+      <el-form :model="modifyForm" :rules="modifyFormRules" ref="ModifyFormRef" label-width="100px">
+        <el-form-item label="USER NAME">
+          <el-input v-model="modifyForm.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="EMAIL">
+          <el-input v-model="modifyForm.email" prop="email"></el-input>
+        </el-form-item>
+        <el-form-item label="MOBILE">
+          <el-input v-model="modifyForm.mobile" prop="email"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="modifyDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="modifyDialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -83,6 +113,24 @@
 <script>
 export default {
   data() {
+    //validate email rules
+    var checkEmail = (rule, value, cb) => {
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
+      if (regEmail.test(value)) {
+        //value is ture
+        return cb();
+      }
+      cb(new Error("please enter the legal email address"));
+    };
+    //validate mobile rules
+    var checkMobile = (rule, value, cb) => {
+      const regMobile = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/;
+      if (regMobile.test(value)) {
+        //value is true
+        return cb();
+      }
+      cb(new Error("please enter the legal mobile No"));
+    };
     return {
       //get user list param obj
       queryInfo: {
@@ -94,54 +142,97 @@ export default {
       },
       userlist: [],
       total: 0,
-      //default hide dialog
+      //default hide add dialog
       addDialogVisible: false,
       //add user form data
       addForm: {
         username: "",
         password: "",
         email: "",
-        mobile: ''
+        mobile: ""
       },
       //add user form rules
-      addFormRules: {},
-      //add user name validate rules
-      username: [
-        { required: true, message: "Please enter user name", trigger: "blur" },
-        {
-          min: 3,
-          max: 10,
-          message: "3-10 characters in length",
-          trigger: "blur"
-        }
-      ],
-      password: [
-        {
-          required: true,
-          message: "please enter your password",
-          trigger: "blur"
-        },
-        {
-          min: 6,
-          max: 15,
-          message: "6-15 characters in length",
-          trigger: "blur"
-        }
-      ],
-      email: [
-        {
-          required: true,
-          message: "please enter your email",
-          trigger: "blur"
-        }
-      ],
-      mobile: [
-        {
-          required: true,
-          message: "please enter your mobile No",
-          trigger: "blur"
-        }
-      ]
+      addFormRules: {
+        //add user name validate rules
+        username: [
+          {
+            required: true,
+            message: "Please enter user name",
+            trigger: "blur"
+          },
+          {
+            min: 3,
+            max: 10,
+            message: "3-10 characters in length",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: "please enter your password",
+            trigger: "blur"
+          },
+          {
+            min: 6,
+            max: 15,
+            message: "6-15 characters in length",
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            required: true,
+            message: "please enter your email",
+            trigger: "blur"
+          },
+          {
+            validator: checkEmail,
+            trigger: "blur"
+          }
+        ],
+        mobile: [
+          {
+            required: true,
+            message: "please enter your mobile No",
+            trigger: "blur"
+          },
+          {
+            validator: checkMobile,
+            trigger: "blur"
+          }
+        ]
+      },
+      //default hide modify dialog
+      modifyDialogVisible: false,
+      //enquiry user info pbj
+      modifyForm: {
+      },
+      //modify user form rules
+      modifyFormRules :{
+        email: [
+          {
+            required: true,
+            message: "please enter your email",
+            trigger: "blur"
+          },
+          {
+            validator: checkEmail,
+            trigger: "blur"
+          }
+        ],
+        mobile: [
+          {
+            required: true,
+            message: "please enter your mobile No",
+            trigger: "blur"
+          },
+          {
+            validator: checkMobile,
+            trigger: "blur"
+          }
+        ]
+      },
     };
   },
   created() {
@@ -179,6 +270,32 @@ export default {
         return (this.$message.error = "update user state failed");
       }
       this.$message.success("update user state success");
+    },
+    //listener for Dialog closed
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields();
+    },
+    //pre-validate form
+    addUser() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return;
+        //true => passed to start connect with database
+        const { data: res } = await this.$http.post("users", this.addForm);
+        if (res.meta.status !== 201) {
+          this.$message.error("add User failed");
+        }
+        this.$message.success("add User success");
+        //add success hide Dialog
+        this.addDialogVisible = false;
+      });
+    },
+    async showEditDialog(id) {
+      const { data: res } = await this.$http.get("users/" + id);
+      if (res.meta.status !== 200) {
+        return this.$message.error("enquiry user info failed");
+      }
+      this.modifyForm = res.data
+      this.modifyDialogVisible = true;
     }
   }
 };

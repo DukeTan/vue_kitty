@@ -11,7 +11,7 @@
     <!--main area-->
     <el-container>
       <!--aside-->
-      <el-aside :width="isCollapse ? '64px' : '200px'">
+      <el-aside :width="isCollapse ? '64px' : '142px'">
         <div class="toggle-button" @click="toggleCollapse">丨丨丨</div>
         <!--menu area-->
         <el-menu
