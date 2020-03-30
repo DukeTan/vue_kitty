@@ -3,8 +3,8 @@
     <!-- bread crumb Nav area -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">Home</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+      <el-breadcrumb-item>User Management</el-breadcrumb-item>
+      <el-breadcrumb-item>User List</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- Card view area -->
@@ -40,7 +40,12 @@
               size="small"
               @click="showEditDialog(scope.row.id)"
             ></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="small"></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="small"
+              @click="removeUserbyId(scope.row.id)"
+            ></el-button>
             <el-tooltip effect="dark" content="Setting" placement="top" :enterable="false">
               <el-button type="warning" icon="el-icon-setting" size="small"></el-button>
             </el-tooltip>
@@ -89,24 +94,32 @@
     </el-dialog>
 
     <!-- modify user dialog -->
-    <el-dialog title="Modify User" :visible.sync="modifyDialogVisible" width="50%">
+    <el-dialog
+      title="Modify User"
+      :visible.sync="modifyDialogVisible"
+      width="50%"
+      @close="editDialogClosed"
+    >
       <!-- modify content -->
       <el-form :model="modifyForm" :rules="modifyFormRules" ref="ModifyFormRef" label-width="100px">
         <el-form-item label="USER NAME">
           <el-input v-model="modifyForm.username" disabled></el-input>
         </el-form-item>
-        <el-form-item label="EMAIL">
-          <el-input v-model="modifyForm.email" prop="email"></el-input>
+        <el-form-item label="EMAIL" prop="email">
+          <el-input v-model="modifyForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="MOBILE">
-          <el-input v-model="modifyForm.mobile" prop="email"></el-input>
+        <el-form-item label="MOBILE" prop="email">
+          <el-input v-model="modifyForm.mobile"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="modifyDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="modifyDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="modifyUserInfo">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- delete user messageBox -->
+    <el-button type="text" @click="open">点击打开 Message Box</el-button>
   </div>
 </template>
 
@@ -206,10 +219,9 @@ export default {
       //default hide modify dialog
       modifyDialogVisible: false,
       //enquiry user info pbj
-      modifyForm: {
-      },
+      modifyForm: {},
       //modify user form rules
-      modifyFormRules :{
+      modifyFormRules: {
         email: [
           {
             required: true,
@@ -232,7 +244,7 @@ export default {
             trigger: "blur"
           }
         ]
-      },
+      }
     };
   },
   created() {
@@ -289,13 +301,68 @@ export default {
         this.addDialogVisible = false;
       });
     },
+    //show modify user dialog
     async showEditDialog(id) {
       const { data: res } = await this.$http.get("users/" + id);
       if (res.meta.status !== 200) {
         return this.$message.error("enquiry user info failed");
       }
-      this.modifyForm = res.data
+      this.modifyForm = res.data;
       this.modifyDialogVisible = true;
+    },
+    //listener for dialog closed
+    editDialogClosed() {
+      this.$refs.ModifyFormRef.resetFields();
+    },
+    //get modified data pre-validate
+    modifyUserInfo() {
+      this.$refs.ModifyFormRef.validate(async valid => {
+        if (!valid) return;
+        //true => passed to start connect with database
+        const { data: res } = await this.$http.put(
+          "users/" + this.modifyForm.id,
+          { email: this.modifyForm.email, mobile: this.modifyForm.mobile }
+        );
+        if (res.meta.status !== 200) {
+          this.$message.error("modify user failed");
+        }
+        //close dialog
+        this.modifyDialogVisible = false;
+        //refresh data list
+        this.getUserList();
+        //prompt modify success
+        this.$message.success("modify user success");
+      });
+    },
+    //prompt ask for delete
+    async removeUserbyId(id) {
+      //this function return a promise obj
+      const confirmResult = await this.$confirm(
+        "This will permanently delete user data, continue?",
+        "Tips",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      ).catch(err => {
+        return err;
+      });
+      //(err => err)
+      //if user confirm will return a string confirm
+      //if user cancel will return a string cancel
+      //console.log(confirmResult)
+      if (confirmResult !== "confirm") {
+        return this.$message.info("delete canceled");
+      }
+      //proceed to delete 
+      const {data : res} = await this.$http.delete('users/' + id)
+      if(res.meta.status !== 200){
+        return this.$message.error('delete user failed')
+      }
+      this.$message.success('delete user success')
+      //refresh user list
+      this.getUserList
     }
   }
 };
