@@ -26,9 +26,9 @@
         </el-table-column>
         <!-- index -->
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="roleName" prop="roleName"></el-table-column>
-        <el-table-column label="roleDesc" prop="roleDesc"></el-table-column>
-        <el-table-column label="operation">
+        <el-table-column label="ROLE NAME" prop="roleName"></el-table-column>
+        <el-table-column label="ROLE DESC" prop="roleDesc"></el-table-column>
+        <el-table-column label="OPERATION">
           <template v-slot:default="scope">
             <el-button
               type="primary"
@@ -81,10 +81,10 @@
       <!-- modify content -->
       <el-form :model="modifyForm" :rules="modifyFormRules" ref="ModifyFormRef" label-width="110px">
         <el-form-item label="ROLE NAME" prop="rolename">
-          <el-input v-model="modifyForm.rolename"></el-input>
+          <el-input v-model="modifyForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="ROLE DESC" prop="roledesc">
-          <el-input v-model="modifyForm.roledesc"></el-input>
+          <el-input v-model="modifyForm.roleDesc"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -168,7 +168,10 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return;
         //true => passed to start connect with database
-        const { data: res } = await this.$http.post("roles", this.addForm);
+        const { data: res } = await this.$http.post("roles", {
+          roleName: this.addForm.rolename,
+          roleDesc: this.addForm.roledesc
+        });
         if (res.meta.status !== 201) {
           this.$message.error("add Role failed");
         }
@@ -198,8 +201,8 @@ export default {
         const { data: res } = await this.$http.put(
           "roles/" + this.modifyForm.id,
           {
-            roleName: this.modifyForm.rolename,
-            roleDesc: this.modifyForm.roledesc
+            roleName: this.modifyForm.roleName,
+            roleDesc: this.modifyForm.roleDesc
           }
         );
         if (res.meta.status !== 200) {

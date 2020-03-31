@@ -23,16 +23,16 @@
       <!-- user list area -->
       <el-table :data="userlist" border stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="name" prop="username"></el-table-column>
-        <el-table-column label="email" prop="email"></el-table-column>
-        <el-table-column label="mobile" prop="mobile"></el-table-column>
-        <el-table-column label="role" prop="role_name"></el-table-column>
-        <el-table-column label="status">
+        <el-table-column label="NAME" prop="username"></el-table-column>
+        <el-table-column label="EMAIL" prop="email"></el-table-column>
+        <el-table-column label="MOBILE" prop="mobile"></el-table-column>
+        <el-table-column label="ROLE" prop="role_name"></el-table-column>
+        <el-table-column label="STATUS">
           <template v-slot:default="scope">
             <el-switch v-model="scope.row.mg_state" @change="userStateChanged(scope.row)"></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="operation" width="180px">
+        <el-table-column label="OPERATION" width="180px">
           <template slot-scope="scope">
             <el-button
               type="primary"

@@ -11,9 +11,9 @@
     <el-card>
       <el-table :data="rightsList" stripe>
           <el-table-column type="index"></el-table-column>
-          <el-table-column label="authName" prop="authName"></el-table-column>
-          <el-table-column label="path" prop="path"></el-table-column>
-          <el-table-column label="authLevel" prop="level">
+          <el-table-column label="AUTH NAME" prop="authName"></el-table-column>
+          <el-table-column label="PATH" prop="path"></el-table-column>
+          <el-table-column label="AUTH LEVEL" prop="level">
               <template v-slot:default="scope">
                   <el-tag v-if="scope.row.level === '0'">一级</el-tag>
                   <el-tag type="success" v-if="scope.row.level === '1'">二级</el-tag>
