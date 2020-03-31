@@ -206,6 +206,36 @@ export default {
         //prompt modify success
         this.$message.success("modify roles success");
       });
+    },
+    //prompt ask for delete
+    async removeRolebyId(id) {
+      //this function return a promise obj
+      const confirmResult = await this.$confirm(
+        "This will permanently delete Role data, continue?",
+        "Tips",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      ).catch(err => {
+        return err;
+      });
+      //(err => err)
+      //if user confirm will return a string confirm
+      //if user cancel will return a string cancel
+      //console.log(confirmResult)
+      if (confirmResult !== "confirm") {
+        return this.$message.info("delete canceled");
+      }
+      //proceed to delete 
+      const {data : res} = await this.$http.delete('roles/' + id)
+      if(res.meta.status !== 200){
+        return this.$message.error('delete Role failed')
+      }
+      this.$message.success('delete Role success')
+      //refresh user list
+      this.getRoleslist
     }
   }
 };
