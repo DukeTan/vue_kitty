@@ -166,7 +166,6 @@ export default {
       },
       //add user form rules
       addFormRules: {
-        //add user name validate rules
         username: [
           {
             required: true,
