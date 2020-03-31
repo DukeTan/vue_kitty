@@ -152,7 +152,6 @@ export default {
         return this.$message.error("get Role list failed");
       }
       this.roleList = res.data;
-      console.log(this.roleList);
     },
     //listener for dialog closed
     addDialogClosed() {
