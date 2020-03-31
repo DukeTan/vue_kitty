@@ -17,8 +17,19 @@
       </el-row>
       <!-- roles list -->
       <el-table :data="roleList" border stripe>
+        <!-- expand column -->
         <el-table-column type="expand">
           <template v-slot:default="scope">
+            <el-row :class="['bdbottom', i1 === 0 ? 'bdtop':'']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
+              <!-- 1st level -->
+              <el-col :span="5" >
+                <el-tag>{{item1.authName}}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <!-- 2nd level -->
+              <el-col :span="19"></el-col>
+            </el-row>
+
             <pre>
             {{scope.row}}
             </pre>
@@ -243,7 +254,7 @@ export default {
         return this.$message.error('delete Role failed')
       }
       this.$message.success('delete Role success')
-      //refresh user list
+      //refresh user list 
       this.getRoleslist
     }
   }
@@ -251,4 +262,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-tag{
+  margin: 7px;
+}
+.bdtop{
+  border-top: 1px solid #eee;
+}
+.bdbottom{
+  border-bottom: 1px solid #eee;
+}
 </style>
