@@ -17,7 +17,13 @@
       </el-row>
       <!-- roles list -->
       <el-table :data="roleList" border stripe>
-        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="expand">
+          <template v-slot:default="scope">
+            <pre>
+            {{scope.row}}
+            </pre>
+          </template>
+        </el-table-column>
         <!-- index -->
         <el-table-column type="index"></el-table-column>
         <el-table-column label="roleName" prop="roleName"></el-table-column>
