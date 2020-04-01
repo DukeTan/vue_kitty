@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag } from 'element-ui'
+import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree } from 'element-ui'
 
 import './assets/css/global.css'
 
@@ -49,6 +49,7 @@ Vue.use(Tooltip)
 Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Tag)
+Vue.use(Tree)
 
 Vue.config.productionTip = false
 
