@@ -137,9 +137,9 @@
     </el-dialog>
 
     <!-- auth arrangement dialog -->
-    <el-dialog title="Arrange Authorization" :visible.sync="setAuthDialogvisible" width="50%">
+    <el-dialog title="Arrange Authorization" :visible.sync="setAuthDialogvisible" width="50%" @close= "setAuthDialogClosed">
       <!-- tree area -->
-      <el-tree :data="authlist" :props="treeProps" show-checkbox node-key="id" default-expand-all default-checked-keys="defkeys"></el-tree>
+      <el-tree :data="authlist" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defkeys"></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setAuthDialogvisible = false">取 消</el-button>
         <el-button type="primary" @click="setAuthDialogvisible = false">确 定</el-button>
@@ -365,6 +365,11 @@ export default {
       node.children.forEach(item =>
         this.getLeafKeys(item, arr));
     },
+    //listener for Auth Dialog closed
+    setAuthDialogClosed() {
+      //reassigned defkeys avoid conflict between roles
+      this.defkeys = []
+    }
   }
 };
 </script>
