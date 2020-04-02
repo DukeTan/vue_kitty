@@ -46,8 +46,13 @@
               size="small"
               @click="removeUserbyId(scope.row.id)"
             ></el-button>
-            <el-tooltip effect="dark" content="Setting" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="small"></el-button>
+            <el-tooltip effect="dark" content="Assign Roles" placement="top" :enterable="false">
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="small"
+                @click="setRole(scope.row)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -118,8 +123,33 @@
       </span>
     </el-dialog>
 
-    <!-- delete user messageBox -->
-    <el-button type="text" @click="open">点击打开 Message Box</el-button>
+    <!-- Assign Role dialog  -->
+    <el-dialog
+      title="Assign Role"
+      :visible.sync="setRoleDialogVisible"
+      width="50%"
+      @close="setRoleDialogclosed"
+    >
+      <div>
+        <p>CURRENT USER:{{userInfo.username}}</p>
+        <p>CURRENT ROLE:{{userInfo.role_name}}</p>
+        <p>
+          ASSIGN NEW ROLE:
+          <el-select v-model="selectedRoleId" placeholder="Please select">
+            <el-option
+              v-for="item in roleList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -243,7 +273,15 @@ export default {
             trigger: "blur"
           }
         ]
-      }
+      },
+      //default hide assign role dialog
+      setRoleDialogVisible: false,
+      //need to assign roles user info
+      userInfo: {},
+      //save roleList
+      roleList: [],
+      //save selected role id
+      selectedRoleId
     };
   },
   created() {
@@ -354,14 +392,48 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("delete canceled");
       }
-      //proceed to delete 
-      const {data : res} = await this.$http.delete('users/' + id)
-      if(res.meta.status !== 200){
-        return this.$message.error('delete user failed')
+      //proceed to delete
+      const { data: res } = await this.$http.delete("users/" + id);
+      if (res.meta.status !== 200) {
+        return this.$message.error("delete user failed");
       }
-      this.$message.success('delete user success')
+      this.$message.success("delete user success");
       //refresh user list
-      this.getUserList
+      this.getUserList;
+    },
+    //show assign role dialog
+    async setRole(userInfo) {
+      this.userInfo = userInfo;
+      //get all role list before show dialog
+      const { data: res } = await this.$http.get("roles");
+      if (res.meta.status !== 200) {
+        return this.$message.error("get role list failed");
+      }
+      this.roleList = res.data;
+      this.setRoleDialogVisible = true;
+    },
+    //submit changed role
+    async saveRoleInfo() {
+      if (!this.selectedRoleId) {
+        return this.$message.error("please select the role to assign");
+      }
+      const { data: res } = await this.$http.put(
+        `users/${this.userInfo.id}/role`,
+        {
+          rid: this.selectedRoleId
+        }
+      );
+      if (res.meta.status !== 200) {
+        return this.$message.error("update user role failed");
+      }
+      this.$message.success("update success");
+      this.getUserList();
+      setRoleDialogVisible = false;
+    },
+    //listener for role dialog closed
+    setRoleDialogclosed() {
+      this.selectedRoleId = "";
+      this.userInfo = {};
     }
   }
 };

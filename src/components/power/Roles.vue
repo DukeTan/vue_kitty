@@ -85,7 +85,7 @@
               icon="el-icon-edit"
               size="small"
               @click="showSetAuthDialog(scope.row)"
-            >Arrange Authorization</el-button>
+            >Assign Authorization</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -137,12 +137,25 @@
     </el-dialog>
 
     <!-- auth arrangement dialog -->
-    <el-dialog title="Arrange Authorization" :visible.sync="setAuthDialogvisible" width="50%" @close= "setAuthDialogClosed">
+    <el-dialog
+      title="Arrange Authorization"
+      :visible.sync="setAuthDialogvisible"
+      width="50%"
+      @close="setAuthDialogClosed"
+    >
       <!-- tree area -->
-      <el-tree :data="authlist" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defkeys"></el-tree>
+      <el-tree
+        :data="authlist"
+        :props="treeProps"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="defkeys"
+        ref="treeRef"
+      ></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setAuthDialogvisible = false">取 消</el-button>
-        <el-button type="primary" @click="setAuthDialogvisible = false">确 定</el-button>
+        <el-button type="primary" @click="allotAuth">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -199,15 +212,17 @@ export default {
       },
       //default hide auth dialog
       setAuthDialogvisible: false,
-      //all auth data 
+      //all auth data
       authlist: {},
       //property binding object of tree control
       treeProps: {
-        label: 'authName',
-        children: 'children'
+        label: "authName",
+        children: "children"
       },
       //default selected node id value array
       defkeys: [],
+      //currently about to assign auth id
+      roleId: ""
     };
   },
   created() {
@@ -341,34 +356,58 @@ export default {
     },
     //show auth arrangement dialog
     async showSetAuthDialog(role) {
+      //get role id
+      this.roleId = role.id;
       //get all auth data
-      const {data : res} = await this.$http.get('rights/tree')
+      const { data: res } = await this.$http.get("rights/tree");
 
-      if(res.meta.status !== 200) {
-        return this.$message.error('get auth data failed')
+      if (res.meta.status !== 200) {
+        return this.$message.error("get auth data failed");
       }
-      //save auth data to authlist array 
-      this.authlist = res.data
+      //save auth data to authlist array
+      this.authlist = res.data;
 
       //recursive to get all 3rd lever auth id
-      this.getLeafKeys(role, this.defkeys)
+      this.getLeafKeys(role, this.defkeys);
 
-      this.setAuthDialogvisible = true
+      this.setAuthDialogvisible = true;
     },
-    //use recursive function(递归函数) to get all 3rd lever auth id 
-    getLeafKeys(node, arr){
+    //use recursive function(递归函数) to get all 3rd lever auth id
+    getLeafKeys(node, arr) {
       // if current node doesn't contain children prop
-      if(!node.children) {
-        return arr.push(node.id)
+      if (!node.children) {
+        return arr.push(node.id);
       }
 
-      node.children.forEach(item =>
-        this.getLeafKeys(item, arr));
+      node.children.forEach(item => this.getLeafKeys(item, arr));
     },
     //listener for Auth Dialog closed
     setAuthDialogClosed() {
       //reassigned defkeys avoid conflict between roles
-      this.defkeys = []
+      this.defkeys = [];
+    },
+    //submit & allot authorities
+    async allotAuth() {
+      //get all id save in keys array
+      const keys = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ];
+      //use , divide all keys
+      const idStr = keys.join(",");
+
+      const { data: res } = await this.$http.post(
+        `roles/${this.roleId}/rights`,
+        { rids: idStr }
+      );
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('assign auth failed')
+      }
+      this.$message.success('assign auth success')
+
+      this.getRoleslist()
+      this.setAuthDialogvisible = false
     }
   }
 };
