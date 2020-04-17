@@ -232,12 +232,12 @@ export default {
           "categories",
           this.addCateForm
         );
-        if(res.meta.status !== 201){
-          return this.$message.error('add category failed')
+        if (res.meta.status !== 201) {
+          return this.$message.error("add category failed");
         }
-        this.$message.success('add category success')
-        this.getCateList()
-        this.addCateDialogVisible = false
+        this.$message.success("add category success");
+        this.getCateList();
+        this.addCateDialogVisible = false;
       });
     },
     //listener for add dialog close event reset form data
