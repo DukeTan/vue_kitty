@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option, Cascader } from 'element-ui'
+import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option, Cascader, Alert, Tabs, TabPane} from 'element-ui'
 
 import './assets/css/global.css'
 
@@ -17,7 +17,7 @@ axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
 axios.interceptors.request.use((config) => {
   console.log(config)
   config.headers.Authorization = window.sessionStorage.getItem('token')
-  return config 
+  return config
 })
 
 //achieve global mount to Vue prototype
@@ -57,6 +57,9 @@ Vue.use(Tree)
 Vue.use(Select)
 Vue.use(Option)
 Vue.use(Cascader)
+Vue.use(Alert)
+Vue.use(TabPane)
+Vue.use(Tabs)
 
 Vue.config.productionTip = false
 
