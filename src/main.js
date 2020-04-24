@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option, Cascader, Alert, Tabs, TabPane} from 'element-ui'
+import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option, Cascader, Alert, Tabs, TabPane, Steps, Step} from 'element-ui'
 
 import './assets/css/global.css'
 
@@ -26,6 +26,21 @@ Vue.prototype.$http = axios
 Vue.prototype.$message = Message
 
 Vue.component('tree-table', TreeTable)
+
+Vue.filter('dateFormat', function(originVal){
+  const dt = new Date(originVal)
+
+  const y = dt.getFullYear()
+  //start with 0 so plus 1
+  const m = (dt.getMonth() + 1 + '').padStart(2, '0')
+  const d = (dt.getDate() + 1 + '').padStart(2, '0')
+
+  const hh = (dt.getHours() + '').padStart(2, '0')
+  const mm = (dt.getMinutes() + '').padStart(2, '0')
+  const ss = (dt.getSeconds() + '').padStart(2, '0')
+
+  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+})
 
 //mount confirm function to Vue prototype
 Vue.prototype.$confirm = MessageBox.confirm
@@ -60,6 +75,8 @@ Vue.use(Cascader)
 Vue.use(Alert)
 Vue.use(TabPane)
 Vue.use(Tabs)
+Vue.use(Step)
+Vue.use(Steps)
 
 Vue.config.productionTip = false
 
