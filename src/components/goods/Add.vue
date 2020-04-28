@@ -98,6 +98,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   data() {
     return {
@@ -243,7 +245,14 @@ export default {
     },
     //addgoods
     add(){
-      
+      this.$refs.addFormRef.validate(valid =>{
+        if(!valid){
+          return this.$message.error('please fill neccessary form item')
+        }
+        //add form 
+        const form =_.cloneDeep(this.addForm)
+        form.goods_cat = form.goods_cat.join(',')
+      })
     }
   },
   computed: {
