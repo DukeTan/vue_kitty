@@ -28,7 +28,12 @@
         label-width="100px"
         label-position="top"
       >
-        <el-tabs v-model="activeIndex" :tab-position="'left'">
+        <el-tabs
+          v-model="activeIndex"
+          :tab-position="'left'"
+          before-leave="beforeTabLeave"
+          @tab-click="tabClicked"
+        >
           <el-tab-pane label="BASIC INFO" name="0">
             <el-form-item label="GOODS NAME" prop="goods_name">
               <el-input v-model="addForm.goods_name"></el-input>
@@ -51,7 +56,15 @@
               ></el-cascader>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="GOODS PARAMS" name="1">GOODS PARAMS</el-tab-pane>
+          <el-tab-pane label="GOODS PARAMS" name="1">
+            <!-- render form item -->
+            <el-form-item :label="item.attr_name" v-for="item in manyTableData" :key="item.attr_id">
+              <!-- check box group -->
+              <el-checkbox-group v-model="item.attr_vals">
+                <el-checkbox :label="cb" v-for="(cb, i) in item.attr_vals" :key="i" border></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-tab-pane>
           <el-tab-pane label="GOODS ATTR" name="2">GOODS ATTR</el-tab-pane>
           <el-tab-pane label="GOODS PIC" name="3">GOODS PIC</el-tab-pane>
           <el-tab-pane label="GOODS CONTENT" name="4">GOODS CONTENT</el-tab-pane>
@@ -118,7 +131,11 @@ export default {
         value: "cat_id",
         lable: "cat_name",
         children: "children"
-      }
+      },
+      //dynamic data list
+      manyTableData: [],
+      //static data list
+      onlyTableData: []
     };
   },
   created() {
@@ -138,10 +155,60 @@ export default {
       if (this.addForm.goods_cat.length !== 3) {
         this.addForm.goods_cat = [];
       }
+    },
+    //Tabs before leave
+    beforeTabLeave(activeName, oldActiveName) {
+      if (oldActiveName === "0" && this.addForm.goods_cat.length !== 3) {
+        this.$message.error("pls select goods cate first");
+        return false;
+      }
+    },
+    //click to select diff info
+    async tabClicked() {
+      //visit dynamic param tab
+      if (this.activeIndex === "1") {
+        const { data: res } = await this.$http.get(
+          `categories/${this.cateId}/attributes`,
+          {
+            params: { sel: "many" }
+          }
+        );
+        if (res.meta.status !== 200) {
+          return this.$message.error("get dynamic params list failed");
+        }
+        res.data.array.forEach(item => {
+          item.attr_vals =
+            item.attr_vals.length === 0 ? [] : item.attr_vals.split(" ");
+        });
+        this.manyTableData = res.data;
+      } else if (this.activeIndex === "2") {
+        const { data: res } = await this.$http.get(
+          `categories/${this.cateId}/attributes`,
+          {
+            params: { sel: "only" }
+          }
+        );
+        if(res.meta.status !== 200){
+          return this.$message.error('get static attr data failed')
+        }
+        this.onlyTableData = res.data
+      }
+    }
+  },
+  computed: {
+    cateId() {
+      if (this.addForm.goods_cat.length === 3) {
+        return this.addForm.goods_cat[2];
+      }
+      return null;
     }
   }
 };
 </script>
 
 <style lang="less" scoped>
+.el-checkbox {
+  //top right bottom left
+  margin: 0 10px 0 0 !important;
+}
 </style>
