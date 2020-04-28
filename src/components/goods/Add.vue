@@ -65,12 +65,35 @@
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="GOODS ATTR" name="2">GOODS ATTR</el-tab-pane>
-          <el-tab-pane label="GOODS PIC" name="3">GOODS PIC</el-tab-pane>
-          <el-tab-pane label="GOODS CONTENT" name="4">GOODS CONTENT</el-tab-pane>
+          <el-tab-pane label="GOODS ATTR" name="2">
+            <el-form-item :label="item.attr_name" v-for="item in onlyTableData" :key="item.attr_id">
+              <el-input v-model="item.attr_vals"></el-input>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="GOODS PIC" name="3">
+            <el-upload
+              action="https://www.liulongbin.top:8888/api/private/v1/upload"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              list-type="picture"
+              :headers="headerObj"
+              on-success="handleSuccess"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-tab-pane>
+          <el-tab-pane label="GOODS CONTENT" name="4">
+            <quill-editor v-model="addForm.goods_introduce"></quill-editor>
+            <el-button type="primary" class="btnAdd" @click="add">ADD GOODS</el-button>
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+
+    <!-- pic preview dialog -->
+    <el-dialog title="PIC PREVIEW" :visible.sync="previewVisible" width="50%">
+      <img :src="previewPath" class="previewImg" />
+    </el-dialog>
   </div>
 </template>
 
@@ -85,7 +108,9 @@ export default {
         goods_price: 0,
         goods_weight: 0,
         goods_number: 0,
-        goods_cat: []
+        goods_cat: [],
+        pics: [],
+        goods_introduce: ''
       },
       addFormRules: {
         goods_name: [
@@ -135,7 +160,13 @@ export default {
       //dynamic data list
       manyTableData: [],
       //static data list
-      onlyTableData: []
+      onlyTableData: [],
+      //pic upload component header obj
+      headerObj: {
+        Authorization: window.sessionStorage.getItem("token")
+      },
+      previewPath: "",
+      previewVisible: false
     };
   },
   created() {
@@ -188,11 +219,31 @@ export default {
             params: { sel: "only" }
           }
         );
-        if(res.meta.status !== 200){
-          return this.$message.error('get static attr data failed')
+        if (res.meta.status !== 200) {
+          return this.$message.error("get static attr data failed");
         }
-        this.onlyTableData = res.data
+        this.onlyTableData = res.data;
       }
+    },
+    //process pic preview
+    handlePreview(file) {
+      this.previewPath = file.response.data.url;
+      this.previewVisible = true;
+    },
+    //process pic remove
+    handleRemove(file) {
+      const filePath = file.response.data.tmp_path;
+      const i = this.addForm.pics.findIndex(x => (x.pic = filePath));
+      this.addForm.pics.splice(i, 1);
+    },
+    //save server response pic path
+    handleSuccess(response) {
+      const picInfo = { pic: response.data.tmp_path };
+      this.addForm.pics.push(picInfo);
+    },
+    //addgoods
+    add(){
+      
     }
   },
   computed: {
@@ -210,5 +261,13 @@ export default {
 .el-checkbox {
   //top right bottom left
   margin: 0 10px 0 0 !important;
+}
+
+.previewImg {
+  width: 100%;
+}
+
+.btnAdd{
+  margin-top: 15px;
 }
 </style>
