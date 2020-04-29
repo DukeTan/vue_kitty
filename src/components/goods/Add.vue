@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "lodash";
 
 export default {
   data() {
@@ -112,7 +112,8 @@ export default {
         goods_number: 0,
         goods_cat: [],
         pics: [],
-        goods_introduce: ''
+        goods_introduce: "",
+        attrs: []
       },
       addFormRules: {
         goods_name: [
@@ -244,15 +245,40 @@ export default {
       this.addForm.pics.push(picInfo);
     },
     //addgoods
-    add(){
-      this.$refs.addFormRef.validate(valid =>{
-        if(!valid){
-          return this.$message.error('please fill neccessary form item')
+    add() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error("please fill neccessary form item");
         }
-        //add form 
-        const form =_.cloneDeep(this.addForm)
-        form.goods_cat = form.goods_cat.join(',')
-      })
+        //add form
+        const form = _.cloneDeep(this.addForm);
+        form.goods_cat = form.goods_cat.join(",");
+        //process dynamic params and static attr
+        this.manyTableData.forEach(item => {
+          const newInfo = {
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals.join(" ")
+          };
+          this.addForm.attrs.push(newInfo);
+        });
+        this.onlyTableData.forEach(item => {
+          const newInfo = {
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals
+          };
+          this.addForm.attrs.push(newInfo);
+        });
+        form.attrs = this.addForm.attrs;
+
+        //request to add goods
+        const { data: res } = await this.$http.post("goods", form);
+        if (res.meta.status !== 201) {
+          this.$message.error('add goods failed')
+        }
+
+        this.$message.success('add goods success')
+        this.$router.push('/goods')
+      });
     }
   },
   computed: {
@@ -276,7 +302,7 @@ export default {
   width: 100%;
 }
 
-.btnAdd{
+.btnAdd {
   margin-top: 15px;
 }
 </style>

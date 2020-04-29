@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from '../src/App'
 import router from './router'
-import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option, Cascader, Alert, Tabs, TabPane, Steps, Step, Checkbox, CheckboxGroup, Upload} from 'element-ui'
+import { Button, FormItem, Form, Input, Message, Container, Aside, Header, Main, Menu, Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, TableColumn, Table, Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option, Cascader, Alert, Tabs, TabPane, Steps, Step, Checkbox, CheckboxGroup, Upload, Timeline, TimelineItem} from 'element-ui'
 
 import VueQuillEditor from 'vue-quill-editor'
 
@@ -86,6 +86,8 @@ Vue.use(Steps)
 Vue.use(Checkbox)
 Vue.use(CheckboxGroup)
 Vue.use(Upload)
+Vue.use(Timeline)
+Vue.use(TimelineItem)
 
 Vue.use(VueQuillEditor)
 
